@@ -1,0 +1,77 @@
+{% extends "base.html" %}
+{% block content %}
+<!-- Mensajes (poner arriba para que siempre se vean) -->
+{% if messages %}
+<div class="mb-3">
+    {% for message in messages %}
+    <div class="alert alert-{{ message.tags }} py-2" role="alert">{{ message }}</div>
+    {% endfor %}
+</div>
+{% endif %}
+
+<div class="row">
+    <div class="col-12">
+        <h2 class="mb-3">Resumen visual de los botones recomendados</h2>
+        <p class="text-muted mb-4">Accesos rápidos a las funciones principales del sistema.</p>
+        <div class="card shadow-sm">
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table align-middle">
+                        <thead>
+                            <tr>
+                                <th>Acción</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>Enviar configuración (XML)</td>
+                                <td class="text-end w-50">
+                                    <form action="{% url 'enviar_configuracion' %}" method="post" enctype="multipart/form-data" class="d-flex justify-content-end align-items-center gap-2">
+                                        {% csrf_token %}
+                                        <input type="file" name="xml_file" accept=".xml,application/xml" class="form-control form-control-sm" required aria-label="Seleccionar archivo XML de configuración">
+                                        <button type="submit" class="btn btn-primary btn-sm">Subir XML</button>
+                                    </form>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>Enviar consumos (XML)</td>
+                                <td class="text-end">
+                                    <form action="/upload-consumption" method="post" enctype="multipart/form-data"
+                                        class="d-flex justify-content-end align-items-center gap-2">
+                                        <input type="file" name="consumption_xml" accept=".xml,application/xml" class="form-control form-control-sm" required aria-label="Seleccionar archivo XML de consumos">
+                                        <button type="submit" class="btn btn-primary btn-sm">Subir XML</button>
+                                    </form>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>Operaciones del sistema</td>
+                                <td class="text-end">
+                                    <a href="/system-operations" class="btn btn-outline-primary btn-sm" role="button" aria-label="Operaciones del sistema">Ir al submenú</a>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>Detalle de factura</td>
+                                <td class="text-end">
+                                    <a href="/invoice-detail" target="_blank" class="btn btn-success btn-sm" role="button" aria-label="Detalle de factura (PDF)">Ver factura (PDF)</a>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>Análisis de ventas</td>
+                                <td class="text-end">
+                                    <a href="/sales-analysis" target="_blank" class="btn btn-success btn-sm" role="button" aria-label="Análisis de ventas (PDF)">Ver análisis (PDF)</a>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>Ayuda / Información</td>
+                                <td class="text-end">
+                                    <a href="/help" class="btn btn-outline-secondary btn-sm" role="button" aria-label="Ayuda e información">Ayuda / Info</a>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
