@@ -28,7 +28,7 @@
                                 <td class="text-end w-50">
                                     <form action="{% url 'enviar_configuracion' %}" method="post" enctype="multipart/form-data" class="d-flex justify-content-end align-items-center gap-2">
                                         {% csrf_token %}
-                                        <input type="file" name="xml_file" accept=".xml,application/xml" class="form-control form-control-sm" required aria-label="Seleccionar archivo XML de configuración">
+                                        <input type="file" name="xml_file_config" accept=".xml,application/xml" class="form-control form-control-sm" required aria-label="Seleccionar archivo XML de configuración">
                                         <button type="submit" class="btn btn-primary btn-sm">Subir XML</button>
                                     </form>
                                 </td>
@@ -36,9 +36,9 @@
                             <tr>
                                 <td>Enviar consumos (XML)</td>
                                 <td class="text-end">
-                                    <form action="/upload-consumption" method="post" enctype="multipart/form-data"
-                                        class="d-flex justify-content-end align-items-center gap-2">
-                                        <input type="file" name="consumption_xml" accept=".xml,application/xml" class="form-control form-control-sm" required aria-label="Seleccionar archivo XML de consumos">
+                                    <form action="{% url 'enviar_consumos' %}" method="post" enctype="multipart/form-data" class="d-flex justify-content-end align-items-center gap-2">
+                                        {% csrf_token %}
+                                        <input type="file" name="xml_file_consumos" accept=".xml,application/xml" class="form-control form-control-sm" required aria-label="Seleccionar archivo XML de consumos">
                                         <button type="submit" class="btn btn-primary btn-sm">Subir XML</button>
                                     </form>
                                 </td>
