@@ -6,8 +6,8 @@ class Categoria:
         self.carga_trabajo = carga_trabajo
         self.configuraciones = []
 
-        def agregar_configuracion(self, configuracion):
-            self.configuraciones.append(configuracion)
+    def agregar_configuracion(self, configuracion):
+        self.configuraciones.append(configuracion)
 
     def to_dict(self):
         return {

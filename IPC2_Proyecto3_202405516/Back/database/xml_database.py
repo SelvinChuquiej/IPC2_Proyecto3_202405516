@@ -11,7 +11,7 @@ class XMLDatabase:
         'facturas.xml': 'facturas',
     }
 
-    def __init__(self, data_folder: str = "Back/database"):
+    def __init__(self, data_folder: str = "./database/databaseXML/"):
         self.data_folder = data_folder
         self.ensure_data_folder()
 
