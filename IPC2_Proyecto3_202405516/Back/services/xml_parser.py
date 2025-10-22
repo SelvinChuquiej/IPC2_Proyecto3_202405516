@@ -101,7 +101,7 @@ class XMLParser:
         usuario = cliente_elem.find('usuario').text.strip()
         clave = cliente_elem.find('clave').text.strip()
         direccion = cliente_elem.find('direccion').text.strip()
-        correo = cliente_elem.find('correo').text.strip()
+        correo = cliente_elem.find('correoElectronico').text.strip()
 
         if not self.validators.validar_nit(nit):
             raise Exception(f"NIT inválido: {nit}")
@@ -154,7 +154,7 @@ class XMLParser:
                     tiempo_text = consumo_elem.find('tiempo').text.strip()
                     tiempo = float(tiempo_text)
 
-                    fecha_hora_text = consumo_elem.find('fechahora').text.strip()
+                    fecha_hora_text = consumo_elem.find('fechaHora').text.strip()
                     fecha_hora = self.validators.extraer_primera_fechahora(fecha_hora_text)
 
                     if not fecha_hora:

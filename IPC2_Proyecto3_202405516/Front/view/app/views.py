@@ -15,16 +15,12 @@ def enviar_configuracion(request):
             return redirect('home') 
         uploaded = request.FILES['xml_file_config']
 
-        try:
-            file_bytes = uploaded.read().decode('utf-8') 
-            if not file_bytes.strip().startswith('<?xml'):
-                messages.error(request, "El archivo no es un XML válido.")
-                return redirect('home')
-        except Exception as e:
-            messages.error(request, f"Error al leer el archivo: {str(e)}")
+        if not uploaded.name.lower().endswith('.xml'):
+            messages.error(request, "El archivo debe tener extensión .xml.")
             return redirect('home')
         
         try:
+            file_bytes = uploaded.read().decode('utf-8') 
             headers = {'Content-Type': 'application/xml'}
             resp = requests.post(f"{API_URL}/api/configuracion", data=file_bytes, headers=headers, timeout=15)
             if resp.status_code == 200:
@@ -43,16 +39,12 @@ def enviar_consumos(request):
             return redirect('home') 
         uploaded = request.FILES['xml_file_consumos']
 
-        try:
-            file_bytes = uploaded.read().decode('utf-8') 
-            if not file_bytes.strip().startswith('<?xml'):
-                messages.error(request, "El archivo no es un XML válido.")
-                return redirect('home')
-        except Exception as e:
-            messages.error(request, f"Error al leer el archivo: {str(e)}")
+        if not uploaded.name.lower().endswith('.xml'):
+            messages.error(request, "El archivo debe tener extensión .xml.")
             return redirect('home')
         
         try:
+            file_bytes = uploaded.read().decode('utf-8') 
             headers = {'Content-Type': 'application/xml'}
             resp = requests.post(f"{API_URL}/api/consumos", data=file_bytes, headers=headers, timeout=15)
             if resp.status_code == 200:

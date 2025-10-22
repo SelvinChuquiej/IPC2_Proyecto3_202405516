@@ -5,7 +5,6 @@ from services import XMLParser
 app_bp = Blueprint('app', __name__)
 
 db = XMLDatabase()
-db.initialize_database()
 parser = XMLParser()
 
 @app_bp.get('/status')
@@ -25,6 +24,12 @@ def recibir_configuracion():
             'errores': resultados['errores']
         }
 
+        for recurso in resultados['recursos_procesados']:
+            db.guardar_recurso(recurso.to_dict())
+        
+        for cliente in resultados['clientes_procesados']:
+            db.guardar_cliente(cliente.to_dict())
+
         return jsonify({"status": "success", "message": "Configuración recibida", "data": data}), 200
     
     except Exception as e:
@@ -41,6 +46,16 @@ def recibir_consumos():
             'errores': resultados['errores']
         }
 
+        for consumo in resultados['consumos_procesados']:
+            db.guardar_consumo(consumo.to_dict())
+
         return jsonify({"status": "success", "message": "Consumos recibidos", "data": data}), 200
     except Exception as e:
         return jsonify({"status": "error", "message": str(e)}), 400
+    
+@app_bp.post('/api/sistema/inicializar')
+def inicializar_sistema():
+    if db.inicializar_sistema():
+        return jsonify({"status": "success", "message": "Sistema inicializado correctamente"}), 200
+    else:
+        return jsonify({"status": "error", "message": "Error al inicializar sistema"}), 500
