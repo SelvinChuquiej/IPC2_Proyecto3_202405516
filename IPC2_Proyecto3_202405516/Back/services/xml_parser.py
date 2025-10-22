@@ -1,6 +1,6 @@
 import xml.etree.ElementTree as ET
 from utils import Validators
-from models import Recurso, Categoria, Cliente, Configuracion, Instancia
+from models import Recurso, Categoria, Configuracion, Cliente, Instancia, Consumo
 
 class XMLParser:
     def __init__(self):
@@ -101,7 +101,7 @@ class XMLParser:
         usuario = cliente_elem.find('usuario').text.strip()
         clave = cliente_elem.find('clave').text.strip()
         direccion = cliente_elem.find('direccion').text.strip()
-        correo = cliente_elem.find('correoElectronico').text.strip()
+        correo = cliente_elem.find('correo').text.strip()
 
         if not self.validators.validar_nit(nit):
             raise Exception(f"NIT inválido: {nit}")
@@ -137,3 +137,36 @@ class XMLParser:
             raise Exception(f"Errores en estado de instancia: {', '.join(errores_estado)}")
 
         return Instancia(id_instancia, id_configuracion, nombre, fecha_inicio, estado, fecha_final)
+    
+    def procesar_consumos(self, xml_content):
+        try:
+            root = ET.fromstring(xml_content)
+            resultados = {
+                'consumos_procesados': [],
+                'errores': []
+            }
+
+            for consumo_elem in root.findall('consumo'):
+                try:
+                    nit_cliente = consumo_elem.get('nitCliente')
+                    id_instancia = int(consumo_elem.get('idInstancia'))
+
+                    tiempo_text = consumo_elem.find('tiempo').text.strip()
+                    tiempo = float(tiempo_text)
+
+                    fecha_hora_text = consumo_elem.find('fechahora').text.strip()
+                    fecha_hora = self.validators.extraer_primera_fechahora(fecha_hora_text)
+
+                    if not fecha_hora:
+                        raise Exception(f"Fecha y hora inválida: {fecha_hora_text}")
+                    
+                    consumo = Consumo(nit_cliente, id_instancia, tiempo, fecha_hora)
+                    resultados['consumos_procesados'].append(consumo)
+
+                except Exception as e:
+                    resultados['errores'].append(f"Error en consumo para cliente {consumo_elem.get('nitCliente')}, instancia {consumo_elem.get('idInstancia')}: {str(e)}")
+                
+            return resultados
+        
+        except ET.ParseError as e:
+            raise Exception(f"Error al parsear XML de consumos: {str(e)}")

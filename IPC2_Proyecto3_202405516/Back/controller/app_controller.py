@@ -34,6 +34,13 @@ def recibir_configuracion():
 def recibir_consumos():
     try:
         xml_content = request.data.decode('utf-8')
-        return jsonify({"status": "success", "message": "Consumos recibidos", "data": {"consumos_procesados": 0}}), 200
+        resultados = parser.procesar_consumos(xml_content)
+        
+        data = {
+            'consumos': len(resultados['consumos_procesados']),
+            'errores': resultados['errores']
+        }
+
+        return jsonify({"status": "success", "message": "Consumos recibidos", "data": data}), 200
     except Exception as e:
         return jsonify({"status": "error", "message": str(e)}), 400
