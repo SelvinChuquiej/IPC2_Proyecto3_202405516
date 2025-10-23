@@ -87,7 +87,7 @@ class XMLDatabase:
             ET.SubElement(cliente_elem, 'direccion').text = cliente_data['direccion']
             ET.SubElement(cliente_elem, 'correoElectronico').text = cliente_data['correo_electronico']
 
-            if cliente_data.get('instancias'):
+            '''if cliente_data.get('instancias'):
                 lista_instancias = ET.SubElement(cliente_elem, 'listaInstancias')
                 for instancia in cliente_data['instancias']:
                     instancia_elem = ET.SubElement(lista_instancias, 'instancia', id=str(instancia['id']))
@@ -96,7 +96,7 @@ class XMLDatabase:
                     ET.SubElement(instancia_elem, 'fechaInicio').text = instancia['fecha_inicio']
                     ET.SubElement(instancia_elem, 'estado').text = instancia['estado']
                     if instancia.get('fecha_final'):
-                        ET.SubElement(instancia_elem, 'fechaFinal').text = instancia['fecha_final']
+                        ET.SubElement(instancia_elem, 'fechaFinal').text = instancia['fecha_final']'''
 
             root.append(cliente_elem)
             tree.write(filepath, encoding='utf-8', xml_declaration=True)
@@ -104,6 +104,34 @@ class XMLDatabase:
 
         except Exception as e:
             print(f"Error al guardar cliente: {e}")
+            return False
+        
+    def guardar_categoria(self, categoria_data: Dict[str, Any]) -> bool:
+        try:
+            filepath = self.get_file_path('categorias.xml')
+            tree = ET.parse(filepath)
+            root = tree.getroot()
+
+            categoria_existente = None
+            for elem in root.findall('categoria'):
+                if elem.get('id') == str(categoria_data['id_Categoria']):
+                    categoria_existente = elem
+                    break
+
+            if categoria_existente is not None:
+                root.remove(categoria_existente)
+
+            categoria_elem = ET.Element('categoria', id=str(categoria_data['id_Categoria']))
+            ET.SubElement(categoria_elem, 'nombre').text = categoria_data['nombre']
+            ET.SubElement(categoria_elem, 'descripcion').text = categoria_data['descripcion']
+            ET.SubElement(categoria_elem, 'cargaTrabajo').text = categoria_data['carga_trabajo']
+
+            root.append(categoria_elem)
+            tree.write(filepath, encoding='utf-8', xml_declaration=True)
+            return True
+        
+        except Exception as e:
+            print(f"Error al guardar categoria: {e}")
             return False
 
     def guardar_consumo(self, consumo_data: Dict[str, Any]) -> bool:
@@ -140,14 +168,12 @@ class XMLDatabase:
             return False
 
     def inicializar_sistema(self) -> bool:
-        """Elimina todos los datos y reinicializa la base de datos"""
         try:
             for filename in self.DEFAULT_FILES.keys():
                 filepath = os.path.join(self.data_folder, filename)
                 if os.path.exists(filepath):
                     os.remove(filepath)
 
-            # Volver a inicializar archivos vacíos
             self.initialize_database()
             return True
 

@@ -30,6 +30,9 @@ def recibir_configuracion():
         for cliente in resultados['clientes_procesados']:
             db.guardar_cliente(cliente.to_dict())
 
+        for categoria in resultados['categorias_procesadas']:
+            db.guardar_categoria(categoria.to_dict())
+
         return jsonify({"status": "success", "message": "Configuración recibida", "data": data}), 200
     
     except Exception as e:
