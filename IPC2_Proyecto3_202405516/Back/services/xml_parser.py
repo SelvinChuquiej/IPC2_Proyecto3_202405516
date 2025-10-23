@@ -6,13 +6,15 @@ class XMLParser:
     def __init__(self):
         self.validators = Validators()
 
-    def procesar_configuracion(self, xml_content):
+    def procesar_informacion(self, xml_content):
         try:
             root = ET.fromstring(xml_content)
             resultados = {
                 'recursos_procesados': [],
                 'categorias_procesadas': [],
                 'clientes_procesados': [],
+                'instancias_procesadas': [],
+                'configuraciones_procesadas': [],
                 'errores': []
             }
             
@@ -31,7 +33,7 @@ class XMLParser:
             if lista_categorias is not None:
                 for categoria_elem in lista_categorias.findall('categoria'):
                     try:
-                        categoria = self._procesar_categoria(categoria_elem)
+                        categoria = self._procesar_categoria(categoria_elem, resultados)
                         resultados['categorias_procesadas'].append(categoria)
                     except Exception as e:
                         resultados['errores'].append(f"Error en categoria {categoria_elem.get('id')}: {str(e)}")
@@ -41,7 +43,7 @@ class XMLParser:
             if lista_clientes is not None:
                 for cliente_elem in lista_clientes.findall('cliente'):
                     try:
-                        cliente = self._procesar_clientes(cliente_elem)
+                        cliente = self._procesar_clientes(cliente_elem, resultados)
                         resultados['clientes_procesados'].append(cliente)
                     except Exception as e:
                         resultados['errores'].append(f"Error en cliente {cliente_elem.get('nit')}: {str(e)}")
@@ -64,7 +66,7 @@ class XMLParser:
         
         return Recurso(id_recurso, nombre, abreviatura, metrica, tipo, valor_x_hora)
     
-    def _procesar_categoria(self, categoria_elem):
+    def _procesar_categoria(self, categoria_elem, resultados):
         id_categoria = int(categoria_elem.get('id'))
         nombre = categoria_elem.find('nombre').text.strip()
         descripcion = categoria_elem.find('descripcion').text.strip()
@@ -72,15 +74,17 @@ class XMLParser:
 
         categoria = Categoria(id_categoria, nombre, descripcion, carga_trabajo)
 
+        # Procesar configuraciones
         lista_configuraciones = categoria_elem.find('listaConfiguraciones')
         if lista_configuraciones is not None:
             for config_elem in lista_configuraciones.findall('configuracion'):
-                configuracion = self._procesar_configuracion_element(config_elem)
+                configuracion = self._procesar_configuracion(config_elem)
                 categoria.agregar_configuracion(configuracion)
+                resultados['configuraciones_procesadas'].append(configuracion)
 
         return categoria
     
-    def _procesar_configuracion_element(self, config_elem):
+    def _procesar_configuracion(self, config_elem):
         id_config = int(config_elem.get('id'))
         nombre = config_elem.find('nombre').text.strip()
         descripcion = config_elem.find('descripcion').text.strip()
@@ -95,7 +99,7 @@ class XMLParser:
 
         return configuracion
     
-    def _procesar_clientes(self, cliente_elem):
+    def _procesar_clientes(self, cliente_elem, resultados):
         nit  = cliente_elem.get('nit').strip()
         nombre = cliente_elem.find('nombre').text.strip()
         usuario = cliente_elem.find('usuario').text.strip()
@@ -114,6 +118,7 @@ class XMLParser:
             for instancia_elem in lista_instancias.findall('instancia'):
                 instancia = self._procesar_instancia(instancia_elem)
                 cliente.agregar_instancia(instancia)
+                resultados['instancias_procesadas'].append(instancia)
 
         return cliente
     

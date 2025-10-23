@@ -13,7 +13,7 @@ class Instancia:
     
     def to_dict(self):
         return {
-            'id': self.id_instancia,
+            'id_instancia': self.id_instancia,
             'id_configuracion': self.id_configuracion,
             'nombre': self.nombre,
             'fecha_inicio': self.fecha_inicio,

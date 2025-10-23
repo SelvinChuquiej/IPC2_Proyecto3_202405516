@@ -15,12 +15,14 @@ def get_status():
 def recibir_configuracion():
     try:
         xml_content = request.data.decode('utf-8')
-        resultados = parser.procesar_configuracion(xml_content)
+        resultados = parser.procesar_informacion(xml_content)
 
         data = {
             'recursos': len(resultados['recursos_procesados']),
             'categorias': len(resultados['categorias_procesadas']),
             'clientes': len(resultados['clientes_procesados']),
+            'instancias': len(resultados['instancias_procesadas']),
+            'configuraciones': len(resultados['configuraciones_procesadas']),
             'errores': resultados['errores']
         }
 
@@ -32,6 +34,12 @@ def recibir_configuracion():
 
         for categoria in resultados['categorias_procesadas']:
             db.guardar_categoria(categoria.to_dict())
+
+        for configuracion in resultados['configuraciones_procesadas']:
+            db.guardar_configuracion(configuracion.to_dict())
+        
+        for instancia in resultados['instancias_procesadas']:
+            db.guardar_instancia(instancia.to_dict())
 
         return jsonify({"status": "success", "message": "Configuración recibida", "data": data}), 200
     

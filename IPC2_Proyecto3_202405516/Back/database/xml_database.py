@@ -10,6 +10,7 @@ class XMLDatabase:
         'instancias.xml': 'instancias',
         'facturas.xml': 'facturas',
         'consumos.xml': 'consumos',
+        'configuraciones.xml': 'configuraciones'
     }
 
     def __init__(self, data_folder: str = "./database/databaseXML/"):
@@ -17,9 +18,11 @@ class XMLDatabase:
         self.ensure_data_folder()
         self.initialize_database()
 
+    # Asegurar que la carpeta de datos exista
     def ensure_data_folder(self):
         os.makedirs(self.data_folder, exist_ok=True)
 
+    # Inicializar archivos XML si no existen
     def initialize_database(self, files: Optional[Dict[str, str]] = None):
         files = files or self.DEFAULT_FILES
         for filename, root_element in files.items():
@@ -29,12 +32,14 @@ class XMLDatabase:
                 tree = ET.ElementTree(root)
                 tree.write(filepath, encoding='utf-8', xml_declaration=True)
 
+    # Obtener ruta del archivo XML correspondiente a una entidad
     def get_file_path(self, entity_name: str) -> str:
         name = os.path.basename(entity_name)
         if not name.endswith('.xml'):
             name = f"{name}.xml"
         return os.path.join(self.data_folder, name)
 
+    # Guardar recurso en la base de datos XML
     def guardar_recurso(self, recurso_data: Dict[str, Any]) -> bool:
         try:
             filepath = self.get_file_path('recursos.xml')
@@ -65,6 +70,7 @@ class XMLDatabase:
             print(f"Error al guardar recurso: {e}")
             return False
 
+    # Guardar cliente en la base de datos XML
     def guardar_cliente(self, cliente_data: Dict[str, Any]) -> bool:
         try:
             filepath = self.get_file_path('clientes.xml')
@@ -87,17 +93,6 @@ class XMLDatabase:
             ET.SubElement(cliente_elem, 'direccion').text = cliente_data['direccion']
             ET.SubElement(cliente_elem, 'correoElectronico').text = cliente_data['correo_electronico']
 
-            '''if cliente_data.get('instancias'):
-                lista_instancias = ET.SubElement(cliente_elem, 'listaInstancias')
-                for instancia in cliente_data['instancias']:
-                    instancia_elem = ET.SubElement(lista_instancias, 'instancia', id=str(instancia['id']))
-                    ET.SubElement(instancia_elem, 'idConfiguracion').text = str(instancia['id_configuracion'])
-                    ET.SubElement(instancia_elem, 'nombre').text = instancia['nombre']
-                    ET.SubElement(instancia_elem, 'fechaInicio').text = instancia['fecha_inicio']
-                    ET.SubElement(instancia_elem, 'estado').text = instancia['estado']
-                    if instancia.get('fecha_final'):
-                        ET.SubElement(instancia_elem, 'fechaFinal').text = instancia['fecha_final']'''
-
             root.append(cliente_elem)
             tree.write(filepath, encoding='utf-8', xml_declaration=True)
             return True
@@ -106,6 +101,7 @@ class XMLDatabase:
             print(f"Error al guardar cliente: {e}")
             return False
         
+    # Guardar categoria en la base de datos XML
     def guardar_categoria(self, categoria_data: Dict[str, Any]) -> bool:
         try:
             filepath = self.get_file_path('categorias.xml')
@@ -134,6 +130,7 @@ class XMLDatabase:
             print(f"Error al guardar categoria: {e}")
             return False
 
+    # Guardar consumo en la base de datos XML
     def guardar_consumo(self, consumo_data: Dict[str, Any]) -> bool:
         try:
             filepath = self.get_file_path('consumos.xml')
@@ -167,6 +164,49 @@ class XMLDatabase:
             print(f"Error al guardar consumo: {e}")
             return False
 
+    # Guardar configuracion en la base de datos XML
+    def guardar_configuracion(self, configuracion_data: Dict[str, Any]) -> bool:
+        try:
+            filepath = self.get_file_path('configuraciones.xml')
+            tree = ET.parse(filepath)
+            root = tree.getroot()
+
+            configuracion_elem = ET.Element('configuracion', id=str(configuracion_data['id_configuracion']))
+            ET.SubElement(configuracion_elem, 'nombre').text = configuracion_data['nombre']
+            ET.SubElement(configuracion_elem, 'descripcion').text = configuracion_data['descripcion']
+
+            root.append(configuracion_elem)
+            tree.write(filepath, encoding='utf-8', xml_declaration=True)
+            return True
+
+        except Exception as e:
+            print(f"Error al guardar configuracion: {e}")
+            return False
+
+    # Guardar instancia en la base de datos XML
+    def guardar_instancia(self, instancia_data: Dict[str, Any]) -> bool:
+        try:
+            filepath = self.get_file_path('instancias.xml')
+            tree = ET.parse(filepath)
+            root = tree.getroot()
+
+            instancia_elem = ET.Element('instancia', id=str(instancia_data['id_instancia']))
+            ET.SubElement(instancia_elem, 'idConfiguracion').text = str(instancia_data['id_configuracion'])
+            ET.SubElement(instancia_elem, 'nombre').text = instancia_data['nombre']
+            ET.SubElement(instancia_elem, 'fechaInicio').text = instancia_data['fecha_inicio']
+            ET.SubElement(instancia_elem, 'estado').text = instancia_data['estado']
+            if instancia_data.get('fecha_final'):
+                ET.SubElement(instancia_elem, 'fechaFinal').text = instancia_data['fecha_final']
+
+            root.append(instancia_elem)
+            tree.write(filepath, encoding='utf-8', xml_declaration=True)
+            return True
+
+        except Exception as e:
+            print(f"Error al guardar instancia: {e}")
+            return False
+
+    # Inicializar sistema
     def inicializar_sistema(self) -> bool:
         try:
             for filename in self.DEFAULT_FILES.keys():

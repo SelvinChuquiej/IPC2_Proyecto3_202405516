@@ -10,7 +10,7 @@ class Configuracion:
 
     def to_dict(self):
         return {
-            "id": self.id_configuracion,
+            "id_configuracion": self.id_configuracion,
             "nombre": self.nombre,
             "descripcion": self.descripcion,
             "recursos": self.recursos
