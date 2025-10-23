@@ -37,6 +37,8 @@ def recibir_configuracion():
 
         for configuracion in resultados['configuraciones_procesadas']:
             db.guardar_configuracion(configuracion.to_dict())
+            for id_recurso, cantidad in configuracion.recursos.items():
+                db.guardar_configuracion_recurso(configuracion.id_configuracion, id_recurso, cantidad)
         
         for instancia in resultados['instancias_procesadas']:
             db.guardar_instancia(instancia.to_dict())

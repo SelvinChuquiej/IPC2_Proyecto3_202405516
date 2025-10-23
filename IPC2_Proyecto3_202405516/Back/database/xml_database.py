@@ -10,7 +10,8 @@ class XMLDatabase:
         'instancias.xml': 'instancias',
         'facturas.xml': 'facturas',
         'consumos.xml': 'consumos',
-        'configuraciones.xml': 'configuraciones'
+        'configuraciones.xml': 'configuraciones',
+        'configuracion_recursos.xml': 'configuracionRecursos'
     }
 
     def __init__(self, data_folder: str = "./database/databaseXML/"):
@@ -208,6 +209,41 @@ class XMLDatabase:
 
         except Exception as e:
             print(f"Error al guardar instancia: {e}")
+            return False
+    
+    # Guardar relacion configuracion-recurso en la base de datos XML
+    def guardar_configuracion_recurso(self, id_config: int, id_recurso: int, cantidad: float) -> bool:
+        try:
+            filepath = self.get_file_path('configuracion_recursos.xml')
+            tree = ET.parse(filepath)
+            root = tree.getroot()
+
+            config_elem = None
+            for elem in root.findall('configuracion'):
+                if elem.get('id') == str(id_config):
+                    config_elem = elem
+                    break
+
+            if config_elem is None:
+                config_elem = ET.Element('configuracion', id=str(id_config))
+                root.append(config_elem)
+
+            recurso_existente = None
+            for recurso_elem in config_elem.findall('recurso'):
+                if recurso_elem.get('id') == str(id_recurso):
+                    recurso_existente = recurso_elem
+                    break
+            
+            if recurso_existente is not None:
+                recurso_existente.text = str(cantidad)
+            else:
+                ET.SubElement(config_elem, 'recurso', id=str(id_recurso)).text = str(cantidad)
+
+            tree.write(filepath, encoding='utf-8', xml_declaration=True)
+            return True
+
+        except Exception as e:
+            print(f"Error al guardar relacion configuracion-recurso: {e}")
             return False
 
     # Inicializar sistema
