@@ -75,3 +75,15 @@ def enviar_consumos(request):
             messages.error(request, f'Error de conexión con el backend: {e}')
 
     return render(request, 'index.html')
+
+def consultar_datos(request):
+    try:
+        resp = requests.get(f"{API_URL}/api/sistema/consultar", timeout=15)
+        if resp.status_code == 200:
+            data = resp.json()
+            messages.success(request, "Datos consultados correctamente")
+            return render(request, 'consultar.html', {'datos_consultados': data['data']})
+    except requests.RequestException as e:
+        messages.error(request, f'Error de conexión con el backend: {e}')
+
+    return redirect('home')
