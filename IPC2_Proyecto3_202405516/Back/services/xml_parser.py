@@ -118,6 +118,7 @@ class XMLParser:
         if lista_instancias is not None:
             for instancia_elem in lista_instancias.findall('instancia'):
                 instancia = self._procesar_instancia(instancia_elem)
+                instancia.nit_cliente = nit
                 cliente.agregar_instancia(instancia)
                 resultados['instancias_procesadas'].append(instancia)
 

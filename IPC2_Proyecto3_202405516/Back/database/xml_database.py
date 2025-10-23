@@ -195,7 +195,7 @@ class XMLDatabase:
             tree = ET.parse(filepath)
             root = tree.getroot()
 
-            instancia_elem = ET.Element('instancia', id=str(instancia_data['id_instancia']))
+            instancia_elem = ET.Element('instancia', id=str(instancia_data['id_instancia']), nitCliente=str(instancia_data.get('nit_cliente', '')))
             ET.SubElement(instancia_elem, 'idConfiguracion').text = str(instancia_data['id_configuracion'])
             ET.SubElement(instancia_elem, 'nombre').text = instancia_data['nombre']
             ET.SubElement(instancia_elem, 'fechaInicio').text = instancia_data['fecha_inicio']

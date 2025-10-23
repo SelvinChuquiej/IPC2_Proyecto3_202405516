@@ -1,5 +1,5 @@
 class Instancia:
-    def __init__(self, id_instancia, id_configuracion, nombre, fecha_inicio, estado, fecha_final=None):
+    def __init__(self, id_instancia, id_configuracion, nombre, fecha_inicio, estado, fecha_final=None, nit_cliente=None):
         self.id_instancia = id_instancia
         self.id_configuracion = id_configuracion
         self.nombre = nombre
@@ -7,6 +7,7 @@ class Instancia:
         self.estado = estado  # 'Vigente' o 'Cancelada'
         self.fecha_final = fecha_final
         self.consumos = []  # Lista de objetos Consumo
+        self.nit_cliente = nit_cliente
     
     def agregar_consumo(self, consumo):
         self.consumos.append(consumo)
@@ -19,5 +20,6 @@ class Instancia:
             'fecha_inicio': self.fecha_inicio,
             'estado': self.estado,
             'fecha_final': self.fecha_final,
-            'consumos': [consumo.to_dict() for consumo in self.consumos]
+            'consumos': [consumo.to_dict() for consumo in self.consumos],
+            'nit_cliente': self.nit_cliente
         }
