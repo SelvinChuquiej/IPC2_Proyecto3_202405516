@@ -1,8 +1,9 @@
 class Configuracion:
-    def __init__(self, id_configuracion, nombre, descripcion):
+    def __init__(self, id_configuracion, nombre, descripcion, id_categoria=None):
         self.id_configuracion = id_configuracion
         self.nombre = nombre
         self.descripcion = descripcion
+        self.id_categoria = None
         self.recursos = {}
 
     def agregar_recurso(self, id_recurso, cantidad):
@@ -13,5 +14,5 @@ class Configuracion:
             "id_configuracion": self.id_configuracion,
             "nombre": self.nombre,
             "descripcion": self.descripcion,
-            "recursos": self.recursos
+            "id_categoria": self.id_categoria,
         } 

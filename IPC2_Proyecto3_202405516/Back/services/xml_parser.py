@@ -79,8 +79,9 @@ class XMLParser:
         if lista_configuraciones is not None:
             for config_elem in lista_configuraciones.findall('configuracion'):
                 configuracion = self._procesar_configuracion(config_elem)
+                configuracion.id_categoria = id_categoria
                 categoria.agregar_configuracion(configuracion)
-                resultados['configuraciones_procesadas'].append(configuracion)
+                resultados['configuraciones_procesadas'].append(configuracion) 
 
         return categoria
     

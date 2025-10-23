@@ -171,7 +171,11 @@ class XMLDatabase:
             tree = ET.parse(filepath)
             root = tree.getroot()
 
-            configuracion_elem = ET.Element('configuracion', id=str(configuracion_data['id_configuracion']))
+            configuracion_elem = ET.Element(
+                'configuracion', 
+                id=str(configuracion_data['id_configuracion']),
+                idCategoria=str(configuracion_data.get('id_categoria', ''))
+            )
             ET.SubElement(configuracion_elem, 'nombre').text = configuracion_data['nombre']
             ET.SubElement(configuracion_elem, 'descripcion').text = configuracion_data['descripcion']
 
