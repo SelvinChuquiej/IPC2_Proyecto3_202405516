@@ -24,7 +24,19 @@ def enviar_configuracion(request):
             headers = {'Content-Type': 'application/xml'}
             resp = requests.post(f"{API_URL}/api/configuracion", data=file_bytes, headers=headers, timeout=15)
             if resp.status_code == 200:
-                messages.success(request, f'XML procesado correctamente: {resp.text}')
+                data = resp.json()
+
+                success_message = f"""
+                XML '{uploaded.name}' procesado correctamente:
+                {data['data']['recursos']} recursos creados | 
+                {data['data']['categorias']} categorías creadas | 
+                {data['data']['configuraciones']} configuraciones creadas | 
+                {data['data']['clientes']} clientes creados |
+                {data['data']['instancias']} instancias creadas """
+
+                if data['data']['errores']:
+                    success_message += f"\n Se encontraron {len(data['data']['errores'])} advertencias"
+                messages.success(request, success_message)
             else:
                 messages.error(request, f'Error del backend: {resp.status_code} - {resp.text}')
         except requests.RequestException as e:
@@ -48,7 +60,15 @@ def enviar_consumos(request):
             headers = {'Content-Type': 'application/xml'}
             resp = requests.post(f"{API_URL}/api/consumos", data=file_bytes, headers=headers, timeout=15)
             if resp.status_code == 200:
-                messages.success(request, f'XML de consumos procesado correctamente: {resp.text}')
+                data = resp.json()
+                
+                success_message = f"""
+                XML '{uploaded.name}' procesado correctamente:
+                {data['data']['consumos']} consumos procesados. """
+
+                if data['data']['errores']:
+                    success_message += f"\n Se encontraron {len(data['data']['errores'])} advertencias"
+                messages.success(request, success_message)
             else:
                 messages.error(request, f'Error del backend: {resp.status_code} - {resp.text}')
         except requests.RequestException as e:

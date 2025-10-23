@@ -4,7 +4,10 @@
 {% if messages %}
 <div class="mb-3">
     {% for message in messages %}
-    <div class="alert alert-{{ message.tags }} py-2" role="alert">{{ message }}</div>
+    <div class="alert alert-{{ message.tags }} py-2 d-flex justify-content-between align-items-center" role="alert">
+        {{ message }}
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Cerrar"></button>
+    </div>
     {% endfor %}
 </div>
 {% endif %}
@@ -18,8 +21,9 @@
                 <div class="table-responsive">
                     <table class="table align-middle">
                         <thead>
-                            <tr>
-                                <th>Acción</th>
+                            <tr >
+                                <th>Acción</th> 
+                                <th>Botón</th> 
                             </tr>
                         </thead>
                         <tbody>
@@ -29,7 +33,7 @@
                                     <form action="{% url 'enviar_configuracion' %}" method="post" enctype="multipart/form-data" class="d-flex justify-content-end align-items-center gap-2">
                                         {% csrf_token %}
                                         <input type="file" name="xml_file_config" accept=".xml,application/xml" class="form-control form-control-sm" required aria-label="Seleccionar archivo XML de configuración">
-                                        <button type="submit" class="btn btn-primary btn-sm">Subir XML</button>
+                                        <button type="submit" class="btn btn-primary btn-sm" style="width: 15%;">Subir XML</button>
                                     </form>
                                 </td>
                             </tr>
@@ -39,7 +43,7 @@
                                     <form action="{% url 'enviar_consumos' %}" method="post" enctype="multipart/form-data" class="d-flex justify-content-end align-items-center gap-2">
                                         {% csrf_token %}
                                         <input type="file" name="xml_file_consumos" accept=".xml,application/xml" class="form-control form-control-sm" required aria-label="Seleccionar archivo XML de consumos">
-                                        <button type="submit" class="btn btn-primary btn-sm">Subir XML</button>
+                                        <button type="submit" class="btn btn-primary btn-sm" style="width: 15%;">Subir XML</button>
                                     </form>
                                 </td>
                             </tr>
