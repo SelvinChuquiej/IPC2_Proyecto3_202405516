@@ -1,6 +1,5 @@
 {% extends "base.html" %}
 {% block content %}
-<!-- Mensajes (poner arriba para que siempre se vean) -->
 {% if messages %}
 <div class="mb-3">
     {% for message in messages %}
@@ -14,65 +13,127 @@
 
 <div class="row">
     <div class="col-12">
-        <h2 class="mb-3">Resumen visual de los botones recomendados</h2>
-        <p class="text-muted mb-4">Accesos rápidos a las funciones principales del sistema.</p>
-        <div class="card shadow-sm">
+        <h2 class="mb-3">Mensajes de entrada</h2>
+        <p class="text-muted mb-4">Enviar mensajes XML de configuración y consumos.</p>
+
+        <div class="card shadow-sm mb-4">
             <div class="card-body">
                 <div class="table-responsive">
-                    <table class="table align-middle">
+                    <table class="table align-middle mb-0">
                         <thead>
-                            <tr >
-                                <th>Acción</th> 
-                                <th>Botón</th> 
+                            <tr>
+                                <th>Acción</th>
+                                <th>Descripción</th>
+                                <th style="width: 35%;" class="text-end">Botón / Formulario</th>
                             </tr>
                         </thead>
                         <tbody>
                             <tr>
                                 <td>Enviar configuración (XML)</td>
-                                <td class="text-end w-50">
-                                    <form action="{% url 'enviar_configuracion' %}" method="post" enctype="multipart/form-data" class="d-flex justify-content-end align-items-center gap-2">
+                                <td>Sube un .xml con recursos, categorías, clientes e instancias. El sistema mostrará el resultado del procesamiento.</td>
+                                <td class="text-end">
+                                    <form action="{% url 'enviar_configuracion' %}" method="post" enctype="multipart/form-data" class="d-flex justify-content-end align-items-center gap-2" aria-label="Formulario subir configuración">
                                         {% csrf_token %}
-                                        <input type="file" name="xml_file_config" accept=".xml,application/xml" class="form-control form-control-sm" required aria-label="Seleccionar archivo XML de configuración">
-                                        <button type="submit" class="btn btn-primary btn-sm" style="width: 15%;">Subir XML</button>
+                                        <label class="visually-hidden" for="xml_file_config">Archivo XML de configuración</label>
+                                        <input id="xml_file_config" type="file" name="xml_file_config" accept=".xml,application/xml" class="form-control form-control-sm" required>
+                                        <button type="submit" class="btn btn-primary btn-sm" style="width: 30%;">Subir XML</button>
                                     </form>
+                                    <div class="form-text small text-end mt-1">Selecciona un archivo .xml válido.</div>
                                 </td>
                             </tr>
+
                             <tr>
                                 <td>Enviar consumos (XML)</td>
+                                <td>Sube un .xml con consumos. Se mostrará cuántos consumos se procesaron.</td>
                                 <td class="text-end">
-                                    <form action="{% url 'enviar_consumos' %}" method="post" enctype="multipart/form-data" class="d-flex justify-content-end align-items-center gap-2">
+                                    <form action="{% url 'enviar_consumos' %}" method="post" enctype="multipart/form-data" class="d-flex justify-content-end align-items-center gap-2" aria-label="Formulario subir consumos">
                                         {% csrf_token %}
-                                        <input type="file" name="xml_file_consumos" accept=".xml,application/xml" class="form-control form-control-sm" required aria-label="Seleccionar archivo XML de consumos">
-                                        <button type="submit" class="btn btn-primary btn-sm" style="width: 15%;">Subir XML</button>
+                                        <label class="visually-hidden" for="xml_file_consumos">Archivo XML de consumos</label>
+                                        <input id="xml_file_consumos" type="file" name="xml_file_consumos" accept=".xml,application/xml" class="form-control form-control-sm" required>
+                                        <button type="submit" class="btn btn-primary btn-sm" style="width: 30%;">Subir XML</button>
                                     </form>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>Operaciones del sistema</td>
-                                <td class="text-end">
-                                    <a href="/system-operations" class="btn btn-outline-primary btn-sm" role="button" aria-label="Operaciones del sistema">Ir al submenú</a>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>Detalle de factura</td>
-                                <td class="text-end">
-                                    <a href="/invoice-detail" target="_blank" class="btn btn-success btn-sm" role="button" aria-label="Detalle de factura (PDF)">Ver factura (PDF)</a>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>Análisis de ventas</td>
-                                <td class="text-end">
-                                    <a href="/sales-analysis" target="_blank" class="btn btn-success btn-sm" role="button" aria-label="Análisis de ventas (PDF)">Ver análisis (PDF)</a>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>Ayuda / Información</td>
-                                <td class="text-end">
-                                    <a href="/help" class="btn btn-outline-secondary btn-sm" role="button" aria-label="Ayuda e información">Ayuda / Info</a>
+                                    <div class="form-text small text-end mt-1">Selecciona un archivo .xml válido.</div>
                                 </td>
                             </tr>
                         </tbody>
                     </table>
+                </div>
+            </div>
+        </div>
+
+        <h2 class="mb-3">Operaciones del sistema</h2>
+        <p class="text-muted mb-4">Gestión completa de datos, procesos y reportes del sistema.</p>
+
+        <div class="card shadow-sm mb-4">
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table align-middle mb-0">
+                        <thead>
+                            <tr>
+                                <th>Acción</th>
+                                <th>Descripción</th>
+                                <th class="text-end" style="width: 25%;">Botón</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>Inicializar sistema</td>
+                                <td class="text-muted">Eliminar todos los datos para iniciar pruebas. (Se solicita
+                                    confirmación antes de ejecutar.)</td>
+                                <td class="text-end">
+                                    <form action="" method="post"onsubmit="return confirm('¿Eliminar todos los datos y reiniciar el sistema? Esta acción es irreversible.');" class="d-inline" aria-label="Inicializar sistema">
+                                        {% csrf_token %}
+                                        <button type="submit" class="btn btn-danger btn-sm" style="width: 35%;">Inicializar</button>
+                                    </form>
+                                </td>
+                            </tr>
+
+                            <tr>
+                                <td>Consultar datos</td>
+                                <td class="text-muted">Ver categorías, recursos, configuraciones, clientes, instancias y consumos pendientes.</td>
+                                <td class="text-end">
+                                    <a href="" class="btn btn-outline-primary btn-sm" style="width: 35%;">Consultar</a>
+                                </td>
+                            </tr>
+
+                            <tr>
+                                <td>Creación de nuevos datos</td>
+                                <td class="text-muted">Crear o modificar categorías, recursos, clientes e instancias usando las mismas APIs de configuración.</td>
+                                <td class="text-end">
+                                    <a href="" class="btn btn-outline-primary btn-sm" style="width: 35%;">Crear</a>
+                                </td>
+                            </tr>
+
+                            <tr>
+                                <td>Proceso de facturación</td>
+                                <td class="text-muted">Seleccionar rango de fechas y generar facturas por consumos no facturados. Cada factura incluye número, NIT, fecha y monto.</td>
+                                <td class="text-end">
+                                    <a href="" class="btn btn-outline-primary btn-sm" style="width: 35%;">Facturar</a>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="mt-3 d-flex flex-wrap gap-2">
+                    <a href="" target="_blank" class="btn btn-success btn-sm">Detalle de factura (PDF)</a>
+                    <a href="" target="_blank" class="btn btn-success btn-sm">Análisis de ventas (PDF)</a>
+                </div>
+            </div>
+        </div>
+
+        <h2 class="mb-3">Documentación y ayuda</h2>
+        <p class="text-muted mb-4">Información del estudiante y documentación del programa.</p>
+
+        <div class="card shadow-sm mb-5">
+            <div class="card-body d-flex flex-column flex-md-row justify-content-between align-items-start gap-3">
+                <div>
+                    <strong>Información del estudiante</strong>
+                    <div class="text-muted small">Datos del autor y contacto.</div>
+                </div>
+                <div class="d-flex gap-2">
+                    <a href="" class="btn btn-outline-secondary btn-sm">Ver estudiante</a>
+                    <a href="" class="btn btn-outline-secondary btn-sm">Documentación</a>
                 </div>
             </div>
         </div>
