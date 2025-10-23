@@ -87,3 +87,16 @@ def consultar_datos(request):
         messages.error(request, f'Error de conexión con el backend: {e}')
 
     return redirect('home')
+
+def inicializar_sistema(request):
+    if request.method == 'POST':
+        try:
+            resp = requests.post(f"{API_URL}/api/sistema/inicializar", timeout=15)
+            if resp.status_code == 200:
+                messages.success(request, "Sistema inicializado correctamente")
+            else:
+                messages.error(request, f'Error del backend: {resp.status_code} - {resp.text}')
+        except requests.RequestException as e:
+            messages.error(request, f'Error de conexión con el backend: {e}')
+
+    return redirect('home')

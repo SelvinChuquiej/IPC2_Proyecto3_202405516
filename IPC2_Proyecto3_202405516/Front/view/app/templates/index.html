@@ -81,7 +81,7 @@
                                 <td class="text-muted">Eliminar todos los datos para iniciar pruebas. (Se solicita
                                     confirmación antes de ejecutar.)</td>
                                 <td class="text-end">
-                                    <form action="" method="post"onsubmit="return confirm('¿Eliminar todos los datos y reiniciar el sistema? Esta acción es irreversible.');" class="d-inline" aria-label="Inicializar sistema">
+                                    <form action="{% url 'inicializar_sistema' %}" method="post" onsubmit="return confirm('¿Eliminar todos los datos y reiniciar el sistema? Esta acción es irreversible.');" class="d-inline" aria-label="Inicializar sistema">
                                         {% csrf_token %}
                                         <button type="submit" class="btn btn-danger btn-sm" style="width: 35%;">Inicializar</button>
                                     </form>
