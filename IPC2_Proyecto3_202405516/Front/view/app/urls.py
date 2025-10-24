@@ -10,4 +10,5 @@ urlpatterns = [
     path('menu_creacion/', views.menu_creacion, name='menu_creacion'),
     path('menu_creacion/crear/categoria/', views.crear_categoria, name='crear_categoria'),
     path('menu_creacion/crear/recurso/', views.crear_recurso, name='crear_recurso'),
+    path('menu_creacion/crear/configuracion/', views.crear_configuracion, name='crear_configuracion'),
 ]

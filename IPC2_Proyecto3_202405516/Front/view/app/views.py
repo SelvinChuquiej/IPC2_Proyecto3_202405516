@@ -142,3 +142,31 @@ def crear_recurso(request):
         else:
             messages.error(request, "Error al crear recurso.")
     return render(request, 'crear_recurso.html')
+
+def crear_configuracion(request):
+    categorias = []
+    try:
+        resp = requests.get(f"{API_URL}/api/sistema/consultar", timeout=10)
+        if resp.status_code == 200:
+            data = resp.json()
+            categorias = data['data'].get('categorias', [])
+    except Exception:
+        pass
+
+    if request.method == 'POST':
+        payload = {
+            "id_configuracion": request.POST.get('id'),
+            "id_categoria": request.POST.get('idCategoria'),
+            "nombre": request.POST.get('nombre'),
+            "descripcion": request.POST.get('descripcion'),
+        }
+        resp = requests.post(f"{API_URL}/api/sistema/menu_creacion/crear/configuracion", json=payload)
+
+        if resp.status_code == 200:
+            messages.success(request, "Configuración creada correctamente.")
+        elif resp.status_code == 409:
+            messages.warning(request, "Ya existe una configuración con ese ID.")
+        else:
+            messages.error(request, "Error al crear configuración.")
+
+    return render(request, 'crear_configuracion.html', {'categorias': categorias})

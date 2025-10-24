@@ -169,11 +169,13 @@ class XMLDatabase:
             tree = ET.parse(filepath)
             root = tree.getroot()
 
-            configuracion_elem = ET.Element(
-                'configuracion', 
-                id=str(configuracion_data['id_configuracion']),
-                idCategoria=str(configuracion_data.get('id_categoria', ''))
-            )
+            id_config = str(configuracion_data.get('id_configuracion') or configuracion_data.get('id'))
+            id_categoria = str(configuracion_data.get('id_categoria', ''))
+            for conf in root.findall('configuracion'):
+                if conf.get('id') == id_config:
+                    raise ValueError(f"La configuración con ID {id_config} ya existe.")
+
+            configuracion_elem = ET.Element('configuracion', id=str(configuracion_data['id_configuracion']), idCategoria=id_categoria)
             ET.SubElement(configuracion_elem, 'nombre').text = configuracion_data['nombre']
             ET.SubElement(configuracion_elem, 'descripcion').text = configuracion_data['descripcion']
 
@@ -181,6 +183,9 @@ class XMLDatabase:
             tree.write(filepath, encoding='utf-8', xml_declaration=True)
             return True
 
+        except ValueError as v:
+            print(f"{v}")
+            return "exists"
         except Exception as e:
             print(f"Error al guardar configuracion: {e}")
             return False

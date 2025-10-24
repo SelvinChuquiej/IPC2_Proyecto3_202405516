@@ -213,3 +213,19 @@ def crear_recurso():
 
     except Exception as e:
         return jsonify({"status": "error", "message": str(e)}), 500
+
+@app_bp.post('/api/sistema/menu_creacion/crear/configuracion')
+def crear_configuracion_menu():
+    try:
+        data = request.json
+        resultado = db.guardar_configuracion(data)
+
+        if resultado is True:
+            return jsonify({"status": "success", "message": "Configuración creada correctamente"}), 200
+        elif resultado == "exists":
+            return jsonify({"status": "warning", "message": "Ya existe una configuración con ese ID"}), 409
+        else:
+            return jsonify({"status": "error", "message": "Error al crear configuración"}), 500
+
+    except Exception as e:
+        return jsonify({"status": "error", "message": str(e)}), 500
