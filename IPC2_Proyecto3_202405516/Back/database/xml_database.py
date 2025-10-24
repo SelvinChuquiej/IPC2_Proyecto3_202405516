@@ -109,14 +109,10 @@ class XMLDatabase:
             tree = ET.parse(filepath)
             root = tree.getroot()
 
-            categoria_existente = None
-            for elem in root.findall('categoria'):
-                if elem.get('id') == str(categoria_data['id_Categoria']):
-                    categoria_existente = elem
-                    break
-
-            if categoria_existente is not None:
-                root.remove(categoria_existente)
+            id_categoria = str(categoria_data.get('id_Categoria') or categoria_data.get('id'))
+            for cat in root.findall('categoria'):
+                if cat.get('id') == id_categoria:
+                    raise ValueError(f"La categoría con ID {id_categoria} ya existe.")
 
             categoria_elem = ET.Element('categoria', id=str(categoria_data['id_Categoria']))
             ET.SubElement(categoria_elem, 'nombre').text = categoria_data['nombre']
@@ -126,7 +122,9 @@ class XMLDatabase:
             root.append(categoria_elem)
             tree.write(filepath, encoding='utf-8', xml_declaration=True)
             return True
-        
+        except ValueError as v:
+            print(f"{v}")
+            return "exists"
         except Exception as e:
             print(f"Error al guardar categoria: {e}")
             return False

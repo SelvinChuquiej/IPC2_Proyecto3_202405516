@@ -181,3 +181,19 @@ def consultar_datos():
     except Exception as e:
         return jsonify({"status": "error", "message": str(e)}), 500
 
+# Creaciones
+@app_bp.post('/api/sistema/menu_creacion/crear/categoria')
+def crear_categoria():
+    try:
+        data = request.json
+        result = db.guardar_categoria(data)
+
+        if result is True:
+            return jsonify({"status": "success", "message": "Categoría creada correctamente"}), 200
+        elif result == "exists":
+            return jsonify({"status": "warning", "message": "La categoría con ese ID ya existe"}), 409
+        else:
+            return jsonify({"status": "error", "message": "No se pudo crear la categoría"}), 500
+
+    except Exception as e:
+        return jsonify({"status": "error", "message": str(e)}), 500

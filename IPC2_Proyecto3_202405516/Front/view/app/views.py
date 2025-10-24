@@ -100,3 +100,25 @@ def inicializar_sistema(request):
             messages.error(request, f'Error de conexión con el backend: {e}')
 
     return redirect('home')
+
+def menu_creacion(request):
+    return render(request, 'menu_creacion.html')
+
+def crear_categoria(request):
+    if request.method == 'POST':
+        payload = {
+            "tipo": "categoria",
+            "id_Categoria": request.POST.get('id'),
+            "nombre": request.POST.get('nombre'),
+            "descripcion": request.POST.get('descripcion'),
+            "carga_trabajo": request.POST.get('carga_trabajo'),
+        }
+        resp = requests.post(f"{API_URL}/api/sistema/menu_creacion/crear/categoria", json=payload)
+        
+        if resp.status_code == 200:
+            messages.success(request, "Categoría creada correctamente.")
+        elif resp.status_code == 409:
+            messages.warning(request, "Ya existe una categoría con ese ID.")
+        else:
+            messages.error(request, "Error al crear categoría.")
+    return render(request, 'crear_categoria.html')
