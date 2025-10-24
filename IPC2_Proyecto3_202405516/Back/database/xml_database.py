@@ -47,14 +47,10 @@ class XMLDatabase:
             tree = ET.parse(filepath)
             root = tree.getroot()
 
-            recurso_existente = None
-            for elem in root.findall('recurso'):
-                if elem.get('id') == str(recurso_data['id_recurso']):
-                    recurso_existente = elem
-                    break
-
-            if recurso_existente is not None:
-                root.remove(recurso_existente)
+            id_recurso = str(recurso_data.get('id_recurso') or recurso_data.get('id'))
+            for recurso in root.findall('recurso'):
+                if recurso.get('id') == id_recurso:
+                    raise ValueError(f"El recurso con ID {id_recurso} ya existe.")
 
             recurso_elem = ET.Element('recurso', id=str(recurso_data['id_recurso']))
             ET.SubElement(recurso_elem, 'nombre').text = recurso_data['nombre']
@@ -67,6 +63,9 @@ class XMLDatabase:
             tree.write(filepath, encoding='utf-8', xml_declaration=True)
             return True
 
+        except ValueError as v:
+            print(f"{v}")
+            return "exists"
         except Exception as e:
             print(f"Error al guardar recurso: {e}")
             return False

@@ -197,3 +197,19 @@ def crear_categoria():
 
     except Exception as e:
         return jsonify({"status": "error", "message": str(e)}), 500
+
+@app_bp.post('/api/sistema/menu_creacion/crear/recurso')
+def crear_recurso():
+    try:
+        data = request.json
+        result = db.guardar_recurso(data)
+
+        if result is True:
+            return jsonify({"status": "success", "message": "Recurso creada correctamente"}), 200
+        elif result == "exists":
+            return jsonify({"status": "warning", "message": "El recurso con ese ID ya existe"}), 409
+        else:
+            return jsonify({"status": "error", "message": "No se pudo crear el recurso"}), 500
+
+    except Exception as e:
+        return jsonify({"status": "error", "message": str(e)}), 500

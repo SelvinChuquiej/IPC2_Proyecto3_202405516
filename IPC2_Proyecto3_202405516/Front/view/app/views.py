@@ -111,10 +111,10 @@ def crear_categoria(request):
             "id_Categoria": request.POST.get('id'),
             "nombre": request.POST.get('nombre'),
             "descripcion": request.POST.get('descripcion'),
-            "carga_trabajo": request.POST.get('carga_trabajo'),
+            "carga_trabajo": request.POST.get('cargaTrabajo'), 
         }
         resp = requests.post(f"{API_URL}/api/sistema/menu_creacion/crear/categoria", json=payload)
-        
+
         if resp.status_code == 200:
             messages.success(request, "Categoría creada correctamente.")
         elif resp.status_code == 409:
@@ -122,3 +122,23 @@ def crear_categoria(request):
         else:
             messages.error(request, "Error al crear categoría.")
     return render(request, 'crear_categoria.html')
+
+def crear_recurso(request):
+    if request.method == 'POST':
+        payload = {
+            "id_recurso": request.POST.get('id'),
+            "nombre": request.POST.get('nombre'),
+            "abreviatura": request.POST.get('abreviatura'),
+            "metrica": request.POST.get('metrica'),
+            "tipo": request.POST.get('tipo'),
+            "valor_x_hora": request.POST.get('valorXhora'),
+        }
+        resp = requests.post(f"{API_URL}/api/sistema/menu_creacion/crear/recurso", json=payload)
+
+        if resp.status_code == 200:
+            messages.success(request, "Recurso creado correctamente.")
+        elif resp.status_code == 409:
+            messages.warning(request, "Ya existe un recurso con ese ID.")
+        else:
+            messages.error(request, "Error al crear recurso.")
+    return render(request, 'crear_recurso.html')

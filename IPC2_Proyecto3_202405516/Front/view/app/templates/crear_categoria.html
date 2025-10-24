@@ -18,7 +18,8 @@
         {% csrf_token %}
         <div class="mb-3">
             <label>ID</label>
-            <input type="text" name="id" class="form-control" required inputmode="numeric" pattern="\d+" title="Sólo números">
+            <input type="text" name="id" class="form-control" required inputmode="numeric" pattern="\d+"
+                title="Sólo números">
         </div>
         <div class="mb-3">
             <label>Nombre</label>
@@ -36,8 +37,10 @@
                 <option value="Baja">Baja</option>
             </select>
         </div>
-        <button type="submit" class="btn btn-success">Guardar</button>
-        <a href="{% url 'menu_creacion' %}" class="btn btn-secondary">Cancelar</a>
+        <div class="d-flex justify-content-between">
+            <button type="submit" class="btn btn-success">Guardar Categoría</button>
+            <a href="{% url 'menu_creacion' %}" class="btn btn-secondary">← Volver</a>
+        </div>
     </form>
 </div>
 {% endblock %}
