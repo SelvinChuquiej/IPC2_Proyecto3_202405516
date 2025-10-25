@@ -254,3 +254,18 @@ def crear_instancia_menu():
 
     except Exception as e:
         return jsonify({"status": "error", "message": str(e)}), 500
+
+@app_bp.post('/api/sistema/menu_creacion/crear/cliente')
+def crear_cliente():
+    try:
+        data = request.json
+        resultado = db.guardar_cliente(data)
+
+        if resultado is True:
+            return jsonify({"status": "success", "message": "Cliente creado correctamente"}), 200
+        elif resultado == "exists":
+            return jsonify({"status": "warning", "message": "Ya existe un cliente con ese NIT"}), 409
+        else:
+            return jsonify({"status": "error", "message": "Error al crear cliente"}), 500
+    except Exception as e:
+        return jsonify({"status": "error", "message": str(e)}), 500

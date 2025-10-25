@@ -51,12 +51,12 @@ class XMLDatabase:
                 if recurso.get('id') == id_recurso:
                     raise ValueError(f"El recurso con ID {id_recurso} ya existe.")
 
-            recurso_elem = ET.Element('recurso', id=str(recurso_data['id_recurso']))
-            ET.SubElement(recurso_elem, 'nombre').text = recurso_data['nombre']
-            ET.SubElement(recurso_elem, 'abreviatura').text = recurso_data['abreviatura']
-            ET.SubElement(recurso_elem, 'metrica').text = recurso_data['metrica']
-            ET.SubElement(recurso_elem, 'tipo').text = recurso_data['tipo']
-            ET.SubElement(recurso_elem, 'valorXhora').text = str(recurso_data['valor_x_hora'])
+            recurso_elem = ET.Element('recurso', id=str(recurso_data.get('id_recurso', '')))
+            ET.SubElement(recurso_elem, 'nombre').text = recurso_data.get('nombre', '')
+            ET.SubElement(recurso_elem, 'abreviatura').text = recurso_data.get('abreviatura', '')
+            ET.SubElement(recurso_elem, 'metrica').text = recurso_data.get('metrica', '')
+            ET.SubElement(recurso_elem, 'tipo').text = recurso_data.get('tipo', '')
+            ET.SubElement(recurso_elem, 'valorXhora').text = str(recurso_data.get('valor_x_hora', ''))
 
             root.append(recurso_elem)
             tree.write(filepath, encoding='utf-8', xml_declaration=True)
@@ -76,26 +76,25 @@ class XMLDatabase:
             tree = ET.parse(filepath)
             root = tree.getroot()
 
-            cliente_existente = None
-            for elem in root.findall('cliente'):
-                if elem.get('nit') == cliente_data['nit']:
-                    cliente_existente = elem
-                    break
-
-            if cliente_existente is not None:
-                root.remove(cliente_existente)
-
-            cliente_elem = ET.Element('cliente', nit=cliente_data['nit'])
-            ET.SubElement(cliente_elem, 'nombre').text = cliente_data['nombre']
-            ET.SubElement(cliente_elem, 'usuario').text = cliente_data['usuario']
-            ET.SubElement(cliente_elem, 'clave').text = cliente_data['clave']
-            ET.SubElement(cliente_elem, 'direccion').text = cliente_data['direccion']
-            ET.SubElement(cliente_elem, 'correoElectronico').text = cliente_data['correo_electronico']
+            nit_cliente = str(cliente_data.get('nit'))
+            for cli in root.findall('cliente'):
+                if cli.get('nit') == nit_cliente:
+                    raise ValueError(f"El cliente con NIT {nit_cliente} ya existe.")
+                
+            cliente_elem = ET.Element('cliente', nit=nit_cliente)
+            ET.SubElement(cliente_elem, 'nombre').text = cliente_data.get('nombre', '')
+            ET.SubElement(cliente_elem, 'usuario').text = cliente_data.get('usuario', '')
+            ET.SubElement(cliente_elem, 'clave').text = cliente_data.get('clave', '')
+            ET.SubElement(cliente_elem, 'direccion').text = cliente_data.get('direccion', '')
+            ET.SubElement(cliente_elem, 'correoElectronico').text = cliente_data.get('correo', '')
 
             root.append(cliente_elem)
             tree.write(filepath, encoding='utf-8', xml_declaration=True)
             return True
 
+        except ValueError as v: 
+            print(f"{v}")
+            return "exists"
         except Exception as e:
             print(f"Error al guardar cliente: {e}")
             return False
@@ -113,9 +112,9 @@ class XMLDatabase:
                     raise ValueError(f"La categoría con ID {id_categoria} ya existe.")
 
             categoria_elem = ET.Element('categoria', id=str(categoria_data['id_Categoria']))
-            ET.SubElement(categoria_elem, 'nombre').text = categoria_data['nombre']
-            ET.SubElement(categoria_elem, 'descripcion').text = categoria_data['descripcion']
-            ET.SubElement(categoria_elem, 'cargaTrabajo').text = categoria_data['carga_trabajo']
+            ET.SubElement(categoria_elem, 'nombre').text = categoria_data.get('nombre', '')
+            ET.SubElement(categoria_elem, 'descripcion').text = categoria_data.get('descripcion', '')
+            ET.SubElement(categoria_elem, 'cargaTrabajo').text = categoria_data.get('carga_trabajo', '')
 
             root.append(categoria_elem)
             tree.write(filepath, encoding='utf-8', xml_declaration=True)
@@ -136,8 +135,8 @@ class XMLDatabase:
 
             consumo_existente = False
             for elem in root.findall('consumo'):
-                mismo_cliente = elem.get('nitCliente') == consumo_data['nit_cliente']
-                misma_instancia = elem.get('idInstancia') == str(consumo_data['id_instancia'])
+                mismo_cliente = elem.get('nitCliente') == consumo_data.get('nit_cliente', '')
+                misma_instancia = elem.get('idInstancia') == str(consumo_data.get('id_instancia', ''))
                 tiempo_elem = elem.find('tiempo')
                 fecha_elem = elem.find('fechahora')
 
@@ -149,9 +148,9 @@ class XMLDatabase:
                     break
 
             if not consumo_existente:
-                consumo_elem = ET.Element('consumo',  nitCliente=consumo_data['nit_cliente'], idInstancia=str(consumo_data['id_instancia']))
-                ET.SubElement(consumo_elem, 'tiempo').text = str(consumo_data['tiempo'])
-                ET.SubElement(consumo_elem, 'fechahora').text = consumo_data['fecha_hora']
+                consumo_elem = ET.Element('consumo',  nitCliente=consumo_data.get('nit_cliente', ''), idInstancia=str(consumo_data.get('id_instancia', '')))
+                ET.SubElement(consumo_elem, 'tiempo').text = str(consumo_data.get('tiempo', ''))
+                ET.SubElement(consumo_elem, 'fechahora').text = consumo_data.get('fecha_hora', '')
 
                 root.append(consumo_elem)
                 tree.write(filepath, encoding='utf-8', xml_declaration=True)
@@ -174,9 +173,9 @@ class XMLDatabase:
                 if conf.get('id') == id_config:
                     raise ValueError(f"La configuración con ID {id_config} ya existe.")
 
-            configuracion_elem = ET.Element('configuracion', id=str(configuracion_data['id_configuracion']), idCategoria=id_categoria)
-            ET.SubElement(configuracion_elem, 'nombre').text = configuracion_data['nombre']
-            ET.SubElement(configuracion_elem, 'descripcion').text = configuracion_data['descripcion']
+            configuracion_elem = ET.Element('configuracion', id=str(configuracion_data.get('id_configuracion', '')), idCategoria=id_categoria)
+            ET.SubElement(configuracion_elem, 'nombre').text = configuracion_data.get('nombre', '')
+            ET.SubElement(configuracion_elem, 'descripcion').text = configuracion_data.get('descripcion', '')
 
             recursos = configuracion_data.get('recursos', [])
 
@@ -216,11 +215,11 @@ class XMLDatabase:
             instancia_elem = ET.Element('instancia', id=id_instancia)
             ET.SubElement(instancia_elem, 'idConfiguracion').text = id_configuracion
             ET.SubElement(instancia_elem, 'nitCliente').text = nit_cliente
-            ET.SubElement(instancia_elem, 'nombre').text = instancia_data['nombre']
-            ET.SubElement(instancia_elem, 'fechaInicio').text = instancia_data['fecha_inicio']
-            ET.SubElement(instancia_elem, 'estado').text = instancia_data['estado']
+            ET.SubElement(instancia_elem, 'nombre').text = instancia_data.get('nombre', '')
+            ET.SubElement(instancia_elem, 'fechaInicio').text = instancia_data.get('fecha_inicio', '')
+            ET.SubElement(instancia_elem, 'estado').text = instancia_data.get('estado', '')
             if instancia_data.get('fecha_final'):
-                ET.SubElement(instancia_elem, 'fechaFinal').text = instancia_data['fecha_final']
+                ET.SubElement(instancia_elem, 'fechaFinal').text = instancia_data.get('fecha_final', '')
 
             root.append(instancia_elem)
             tree.write(filepath, encoding='utf-8', xml_declaration=True)
