@@ -238,3 +238,27 @@ def crear_cliente(request):
             messages.error(request, "Error al crear cliente.")
 
     return render(request, 'crear_cliente.html')
+
+def facturacion_view(request):
+    resultado = None
+    error = None
+
+    if request.method == "POST":
+        fecha_inicio = request.POST.get("fecha_inicio")
+        fecha_fin = request.POST.get("fecha_fin")
+
+        try:
+            response = requests.post(
+                f"{API_URL}/api/facturar",
+                json={"fecha_inicio": fecha_inicio, "fecha_fin": fecha_fin},
+                timeout=10
+            )
+            data = response.json()
+            if data.get("status") == "success":
+                resultado = data.get("data", {})
+            else:
+                error = data.get("message", "Error desconocido al generar facturación")
+        except Exception as e:
+            error = f"No se pudo conectar con el servidor Flask: {e}"
+
+    return render(request, "facturacion.html", {"resultado": resultado, "error": error})

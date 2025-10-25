@@ -250,8 +250,7 @@ class XMLDatabase:
         
 
     #Facturacion    
-    #Helpers de facturación
-    def _parse_dt(self, s: Optional[str]) -> Optional[datetime]:
+    def _parse_fecha_dt(self, s: Optional[str]) -> Optional[datetime]:
         if not s:
             return None
         s = s.strip()
@@ -269,7 +268,11 @@ class XMLDatabase:
             root = tree.getroot()
             for r in root.findall('recurso'):
                 if r.get('id') == str(id_recurso):
-                    return float((r.findtext('valorXhora') or "0").strip())
+                    vxh = (r.findtext('valorXhora') or "0").strip()
+                    try:
+                        return float(vxh)
+                    except Exception:
+                        return 0.0
         except Exception:
             pass
         return 0.0
@@ -298,6 +301,7 @@ class XMLDatabase:
                 return 0.0
             tree = ET.parse(path_cfg)
             root = tree.getroot()
+            # buscar configuración por id
             cfg_elem = None
             for c in root.findall('configuracion'):
                 if c.get('id') == str(id_cfg):
@@ -306,19 +310,21 @@ class XMLDatabase:
             if cfg_elem is None:
                 return 0.0
 
-            parent = cfg_elem.find('recursos') or cfg_elem.find('recursosConfiguracion')
-            if parent is None:
+            # lista de recursos (soporta 'recursos' o 'recursosConfiguracion')
+            recursos_parent = cfg_elem.find('recursos') or cfg_elem.find('recursosConfiguracion')
+            if recursos_parent is None:
                 return 0.0
 
             total = 0.0
-            for r in parent.findall('recurso'):
+            for r in recursos_parent.findall('recurso'):
                 rid = r.get('id') or (r.findtext('id') or "").strip()
                 cantidad_txt = r.get('cantidad') or (r.text or "").strip()
                 try:
                     cantidad = float(cantidad_txt) if cantidad_txt else 0.0
                 except Exception:
                     cantidad = 0.0
-                total += self._valor_x_hora_recurso(rid) * cantidad
+                vxh = self._valor_x_hora_recurso(rid) if rid else 0.0
+                total += vxh * cantidad
             return total
         except Exception:
             return 0.0
@@ -340,41 +346,46 @@ class XMLDatabase:
         except Exception:
             return 1
 
-    # Generar facturas por rango
     def generar_facturas(self, fecha_inicio: str, fecha_fin: str) -> Dict[str, Any]:
-        fi = self._parse_dt(fecha_inicio)
-        ff = self._parse_dt(fecha_fin)
-        if not fi or not ff or ff < fi:
+        # Parse rango
+        fi_dt = self._parse_fecha_dt(fecha_inicio)
+        ff_dt = self._parse_fecha_dt(fecha_fin)
+        if not fi_dt or not ff_dt or ff_dt < fi_dt:
             raise ValueError("Rango de fechas inválido")
 
-        cons_path = self.get_file_path('consumos.xml')
-        if not os.path.exists(cons_path):
+        # Cargar consumos
+        path = self.get_file_path('consumos.xml')
+        if not os.path.exists(path):
             return {"generadas": 0, "facturas": []}
 
-        c_tree = ET.parse(cons_path)
-        c_root = c_tree.getroot()
+        tree = ET.parse(path)
+        root = tree.getroot()
 
+        # Filtrar no facturados y en rango
         por_cliente: Dict[str, List[ET.Element]] = {}
-        for c in c_root.findall('consumo'):
+        for c in root.findall('consumo'):
             if (c.get('facturado') or '').lower() == 'true' or (c.findtext('facturado') or '').lower() == 'true':
                 continue
-
             nit = c.get('nitCliente') or c.findtext('nitCliente') or ''
             id_inst = c.get('idInstancia') or c.findtext('idInstancia') or ''
             tiempo_txt = (c.findtext('tiempo') or '').strip()
             fh_txt = (c.findtext('fechahora') or '').strip()
+
+            # Validar básicos
             if not nit or not id_inst or not tiempo_txt or not fh_txt:
                 continue
-
             try:
                 tiempo = float(tiempo_txt)
             except Exception:
                 continue
 
-            fh = self._parse_dt(fh_txt)
-            if not fh or not (fi <= fh <= ff):
+            fh = self._parse_fecha_dt(fh_txt)
+            if not fh:
+                continue
+            if not (fi_dt <= fh <= ff_dt):
                 continue
 
+            # Anotar campos calculados temporalmente
             c.set('_nit', nit)
             c.set('_idInstancia', str(id_inst))
             c.set('_tiempo', f"{tiempo}")
@@ -383,6 +394,7 @@ class XMLDatabase:
         if not por_cliente:
             return {"generadas": 0, "facturas": []}
 
+        # Asegurar facturas.xml
         fpath = self.get_file_path('facturas.xml')
         if not os.path.exists(fpath):
             ET.ElementTree(ET.Element('facturas')).write(fpath, encoding='utf-8', xml_declaration=True)
@@ -391,26 +403,29 @@ class XMLDatabase:
         f_root = f_tree.getroot()
 
         generadas = []
+        # Para marcado persistente de consumos, reutilizamos el mismo árbol y escribimos al final
         for nit, lista in por_cliente.items():
             numero = self._siguiente_numero_factura()
-            fecha_factura = ff.date().strftime("%Y-%m-%d")
+            fecha_factura = ff_dt.date().strftime("%Y-%m-%d")
 
             total = 0.0
             det = []
+
             for c in lista:
                 id_inst = c.get('_idInstancia')
                 tiempo = float(c.get('_tiempo') or "0")
-                p_hora = self._precio_hora_instancia(id_inst)
-                subtotal = tiempo * p_hora
+                precio_hora = self._precio_hora_instancia(id_inst)
+                subtotal = tiempo * precio_hora
                 total += subtotal
                 det.append({
                     "idInstancia": id_inst,
                     "fechahora": c.findtext('fechahora') or '',
                     "tiempo": tiempo,
-                    "precioHora": p_hora,
+                    "precioHora": precio_hora,
                     "subtotal": subtotal
                 })
 
+            # Crear factura
             fac = ET.Element('factura', id=str(numero))
             ET.SubElement(fac, 'nitCliente').text = nit
             ET.SubElement(fac, 'fechaFactura').text = fecha_factura
@@ -427,6 +442,7 @@ class XMLDatabase:
             f_root.append(fac)
             f_tree.write(fpath, encoding='utf-8', xml_declaration=True)
 
+            # Marcar consumos facturados en el árbol de consumos ya cargado
             for c in lista:
                 c.set('facturado', 'true')
                 c.set('numeroFactura', str(numero))
@@ -438,5 +454,7 @@ class XMLDatabase:
                 "monto": round(total, 2)
             })
 
-        c_tree.write(cons_path, encoding='utf-8', xml_declaration=True)
+        # Persistir marcados en consumos.xml
+        tree.write(path, encoding='utf-8', xml_declaration=True)
+
         return {"generadas": len(generadas), "facturas": generadas}
