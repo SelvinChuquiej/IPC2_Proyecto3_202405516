@@ -145,20 +145,29 @@ def crear_recurso(request):
 
 def crear_configuracion(request):
     categorias = []
+    recursos = []
     try:
         resp = requests.get(f"{API_URL}/api/sistema/consultar", timeout=10)
         if resp.status_code == 200:
             data = resp.json()
             categorias = data['data'].get('categorias', [])
+            recursos = data['data'].get('recursos', [])
     except Exception:
         pass
 
     if request.method == 'POST':
+        recursos_seleccionados = []
+        for key, value in request.POST.items():
+            if key.startswith('cantidad_') and value: 
+                id_recurso = key.split('_')[1]
+                recursos_seleccionados.append({"id": int(id_recurso), "cantidad": float(value)})
+
         payload = {
             "id_configuracion": request.POST.get('id'),
             "id_categoria": request.POST.get('idCategoria'),
             "nombre": request.POST.get('nombre'),
             "descripcion": request.POST.get('descripcion'),
+            "recursos": recursos_seleccionados,
         }
         resp = requests.post(f"{API_URL}/api/sistema/menu_creacion/crear/configuracion", json=payload)
 
@@ -167,6 +176,43 @@ def crear_configuracion(request):
         elif resp.status_code == 409:
             messages.warning(request, "Ya existe una configuración con ese ID.")
         else:
-            messages.error(request, "Error al crear configuración.")
+            messages.error(request, "Error al crear.")
 
-    return render(request, 'crear_configuracion.html', {'categorias': categorias})
+    return render(request, 'crear_configuracion.html', {'categorias': categorias, 'recursos': recursos})
+
+def crear_instancia(request):
+    clientes = []
+    configuraciones = []
+
+    try:
+        resp = requests.get(f"{API_URL}/api/sistema/consultar", timeout=10)
+        if resp.status_code == 200:
+            data = resp.json()
+            clientes = data['data'].get('clientes', [])
+            configuraciones = data['data'].get('configuraciones', [])
+    except Exception as e:
+        print("Error al cargar datos de selección:", e)
+
+    if request.method == 'POST':
+        payload = {
+            "id_instancia": request.POST.get('id'),
+            "id_configuracion": request.POST.get('idConfiguracion'),
+            "nit_cliente": request.POST.get('nitCliente'),
+            "nombre": request.POST.get('nombre'),
+            "fecha_inicio": request.POST.get('fechaInicio'),
+            "estado": request.POST.get('estado'),
+            "fecha_final": request.POST.get('fechaFinal'),
+        }
+        resp = requests.post(f"{API_URL}/api/sistema/menu_creacion/crear/instancia", json=payload)
+
+        if resp.status_code == 200:
+            messages.success(request, "Instancia creada correctamente.")
+        elif resp.status_code == 409:
+            messages.warning(request, "Ya existe una instancia con ese ID.")
+        else:
+            messages.error(request, "Error al crear instancia.")
+
+    return render(request, 'crear_instancia.html', {
+        'clientes': clientes,
+        'configuraciones': configuraciones
+    })

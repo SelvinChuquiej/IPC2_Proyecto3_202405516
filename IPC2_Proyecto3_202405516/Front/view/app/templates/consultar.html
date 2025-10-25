@@ -110,6 +110,7 @@
                                 <th>ID Categoría</th>
                                 <th>Nombre</th>
                                 <th>Descripción</th>
+                                <th>Recursos Asociados</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -119,6 +120,28 @@
                                 <td>{{ cfg.idCategoria }}</td>
                                 <td>{{ cfg.nombre }}</td>
                                 <td>{{ cfg.descripcion }}</td>
+                                <td>
+                                    {% if cfg.recursos %}
+                                    <table class="table table-sm mb-0 border">
+                                        <thead>
+                                            <tr class="table-secondary">
+                                                <th>ID Recurso</th>
+                                                <th>Cantidad</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            {% for r in cfg.recursos %}
+                                            <tr>
+                                                <td>{{ r.id }}</td>
+                                                <td>{{ r.cantidad }}</td>
+                                            </tr>
+                                            {% endfor %}
+                                        </tbody>
+                                    </table>
+                                    {% else %}
+                                    <span class="text-muted small">Sin recursos</span>
+                                    {% endif %}
+                                </td>
                             </tr>
                             {% endfor %}
                         </tbody>

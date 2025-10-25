@@ -3,7 +3,7 @@ class Configuracion:
         self.id_configuracion = id_configuracion
         self.nombre = nombre
         self.descripcion = descripcion
-        self.id_categoria = None
+        self.id_categoria = id_categoria
         self.recursos = {}
 
     def agregar_recurso(self, id_recurso, cantidad):
@@ -15,4 +15,5 @@ class Configuracion:
             "nombre": self.nombre,
             "descripcion": self.descripcion,
             "id_categoria": self.id_categoria,
+            "recursos": [{"id": rid, "cantidad": cant} for rid, cant in self.recursos.items()],
         } 

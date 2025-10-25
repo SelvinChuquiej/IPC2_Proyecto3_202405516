@@ -38,8 +38,6 @@ def recibir_configuracion():
 
         for configuracion in resultados['configuraciones_procesadas']:
             db.guardar_configuracion(configuracion.to_dict())
-            for id_recurso, cantidad in configuracion.recursos.items():
-                db.guardar_configuracion_recurso(configuracion.id_configuracion, id_recurso, cantidad)
         
         for instancia in resultados['instancias_procesadas']:
             db.guardar_instancia(instancia.to_dict())
@@ -124,11 +122,22 @@ def consultar_datos():
         try:
             tree = ET.parse(db.get_file_path('configuraciones.xml'))
             for elem in tree.getroot().findall('configuracion'):
+                recursos_list = []
+                recursos_elem = elem.find('recursosConfiguracion')
+                if recursos_elem is not None:
+                    for recurso in recursos_elem.findall('recurso'):
+                        recursos_list.append({
+                            'id': recurso.get('id'),
+                            'cantidad': recurso.text
+                        })
+
+
                 datos['configuraciones'].append({
                     'id': elem.get('id'),
                     'idCategoria': elem.get('idCategoria', ''),
                     'nombre': safe_text(elem, 'nombre'),
-                    'descripcion': safe_text(elem, 'descripcion')
+                    'descripcion': safe_text(elem, 'descripcion'),
+                    'recursos': recursos_list
                 })
         except Exception:
             pass
@@ -153,7 +162,7 @@ def consultar_datos():
             for elem in tree.getroot().findall('instancia'):
                 datos['instancias'].append({
                     'id': elem.get('id'),
-                    'nitCliente': elem.get('nitCliente', ''),
+                    'nitCliente': safe_text(elem, 'nitCliente'),
                     'idConfiguracion': safe_text(elem, 'idConfiguracion'),
                     'nombre': safe_text(elem, 'nombre'),
                     'fechaInicio': safe_text(elem, 'fechaInicio'),
@@ -226,6 +235,22 @@ def crear_configuracion_menu():
             return jsonify({"status": "warning", "message": "Ya existe una configuración con ese ID"}), 409
         else:
             return jsonify({"status": "error", "message": "Error al crear configuración"}), 500
+
+    except Exception as e:
+        return jsonify({"status": "error", "message": str(e)}), 500
+
+@app_bp.post('/api/sistema/menu_creacion/crear/instancia')
+def crear_instancia_menu():
+    try:
+        data = request.json
+        resultado = db.guardar_instancia(data)
+
+        if resultado is True:
+            return jsonify({"status": "success", "message": "Instancia creada correctamente"}), 200
+        elif resultado == "exists":
+            return jsonify({"status": "warning", "message": "Ya existe una instancia con ese ID"}), 409
+        else:
+            return jsonify({"status": "error", "message": "Error al crear la instancia"}), 500
 
     except Exception as e:
         return jsonify({"status": "error", "message": str(e)}), 500
