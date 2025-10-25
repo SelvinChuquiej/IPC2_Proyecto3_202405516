@@ -86,7 +86,7 @@ class XMLDatabase:
             ET.SubElement(cliente_elem, 'usuario').text = cliente_data.get('usuario', '')
             ET.SubElement(cliente_elem, 'clave').text = cliente_data.get('clave', '')
             ET.SubElement(cliente_elem, 'direccion').text = cliente_data.get('direccion', '')
-            ET.SubElement(cliente_elem, 'correoElectronico').text = cliente_data.get('correo', '')
+            ET.SubElement(cliente_elem, 'correoElectronico').text = cliente_data.get('correo', '') or cliente_data.get('correo_electronico', '')
 
             root.append(cliente_elem)
             tree.write(filepath, encoding='utf-8', xml_declaration=True)
