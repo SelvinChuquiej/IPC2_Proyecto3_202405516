@@ -12,4 +12,5 @@ urlpatterns = [
     path('menu_creacion/crear/recurso/', views.crear_recurso, name='crear_recurso'),
     path('menu_creacion/crear/configuracion/', views.crear_configuracion, name='crear_configuracion'),
     path('menu_creacion/crear/instancia/', views.crear_instancia, name='crear_instancia'),
+    path('menu_creacion/crear/cliente/', views.crear_cliente, name='crear_cliente'),
 ]

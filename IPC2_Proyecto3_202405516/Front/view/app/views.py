@@ -216,3 +216,25 @@ def crear_instancia(request):
         'clientes': clientes,
         'configuraciones': configuraciones
     })
+
+def crear_cliente(request):
+    if request.method == 'POST':
+        payload = {
+            "nit": request.POST.get('nit'),
+            "nombre": request.POST.get('nombre'),
+            "usuario": request.POST.get('usuario'),
+            "clave": request.POST.get('clave'),
+            "direccion": request.POST.get('direccion'),
+            "correo": request.POST.get('correo'),
+        }
+
+        resp = requests.post(f"{API_URL}/api/sistema/menu_creacion/crear/cliente", json=payload)
+
+        if resp.status_code == 200:
+            messages.success(request, "Cliente creado correctamente.")
+        elif resp.status_code == 409:
+            messages.warning(request, "Ya existe un cliente con ese NIT.")
+        else:
+            messages.error(request, "Error al crear cliente.")
+
+    return render(request, 'crear_cliente.html')
