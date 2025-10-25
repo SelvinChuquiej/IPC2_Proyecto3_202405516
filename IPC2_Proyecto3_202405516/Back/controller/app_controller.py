@@ -269,3 +269,17 @@ def crear_cliente():
             return jsonify({"status": "error", "message": "Error al crear cliente"}), 500
     except Exception as e:
         return jsonify({"status": "error", "message": str(e)}), 500
+
+
+@app_bp.post('/api/facturar')
+def facturar():
+    try:
+        data = request.get_json(force=True) or {}
+        fecha_inicio = data.get('fecha_inicio')
+        fecha_fin = data.get('fecha_fin')
+        if not fecha_inicio or not fecha_fin:
+            return jsonify({"status": "error", "message": "fecha_inicio y fecha_fin son requeridas"}), 400
+        resultado = db.generar_facturas(fecha_inicio, fecha_fin)
+        return jsonify({"status": "success", "data": resultado}), 200
+    except Exception as e:
+        return jsonify({"status": "error", "message": str(e)}), 500
